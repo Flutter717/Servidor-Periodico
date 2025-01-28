@@ -4,7 +4,7 @@ const app = express();
 
 const PORT = process.env.PORT || 3000;
 const TARGET_SERVERS = [
-  'https://number-one-4yu9.onrender.com,
+  'https://number-one-4yu9.onrender.com',
   'https://example.com/api2',  // Adicione mais URLs conforme necessário
 ]; 
 const MAX_INTERVAL = 600000; // Intervalo máximo de 10 minutos em milissegundos
