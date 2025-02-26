@@ -3,7 +3,7 @@ const axios = require('axios');
 const app = express();
 
 const TARGET_SERVERS = [
-  'https://agrosystem.onrender.com//ping',
+  'https://agrosystem.onrender.com/ping',
 ];
 
 const MAX_INTERVAL = 300000; // Intervalo máximo de 5 minutos (5 minutos = 300.000 ms)
