@@ -62,5 +62,4 @@ app.get('/pong', async (req, res) => {
 // Inicia o servidor e dispara o ciclo automático de pings
 app.listen(PORT, () => {
   console.log(`Servidor de pings rodando na porta ${PORT}`);
-  schedulePing();
 });
