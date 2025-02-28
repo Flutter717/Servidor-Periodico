@@ -6,11 +6,12 @@ const TARGET_SERVERS = [
   'https://agrosystem.onrender.com/ping',
 ];
 
-const MAX_INTERVAL = 300000; // Intervalo máximo de 5 minutos (5 minutos = 300.000 ms)
-
+const MAX_INTERVAL = 300000; // 5 minutos em milissegundos
 const PORT = process.env.PORT || 3000;
 
-// Função para gerar intervalo aleatório entre 0 e MAX_INTERVAL
+app.use(express.json());
+
+// Função para gerar um intervalo aleatório entre 0 e MAX_INTERVAL
 function getRandomInterval() {
   return Math.floor(Math.random() * MAX_INTERVAL);
 }
@@ -27,27 +28,30 @@ async function makeRequests() {
   }
 }
 
-// Função que será ativada quando a rota /pong for chamada
-async function handlePongRequest() {
-  console.log('Recebido /pong. Agendando chamadas para os servidores de ping...');
+// Função que executa o ping imediatamente e agenda o próximo ping
+async function schedulePing() {
+  console.log("Executando ping imediato aos servidores...");
+  await makeRequests();
+  console.log("Ping enviado aos servidores de resposta.");
 
-  // Dispara uma requisição para os servidores de destino após um intervalo aleatório
+  // Gera um intervalo aleatório para o próximo ping
   const interval = getRandomInterval();
-  console.log(`A próxima chamada de ping será feita em ${interval / 1000} segundos.`);
+  const minutes = Math.floor(interval / 60000);
+  const seconds = Math.floor((interval % 60000) / 1000);
+  console.log(`O próximo ping será em ${minutes} minuto(s) e ${seconds} segundo(s).`);
 
-  setTimeout(async () => {
-    await makeRequests();  // Faz a requisição para os servidores de ping
-    console.log('Ping enviado aos servidores de resposta.');
-  }, interval);
+  setTimeout(schedulePing, interval);
 }
 
-// Rota /pong que recebe o "pong" e aciona a função de fazer os pings
+// Rota opcional para disparar o ping manualmente via /pong
 app.get('/pong', async (req, res) => {
-  await handlePongRequest();
-  res.send('Requisição /pong recebida e pings agendados.');
+  console.log("Rota /pong chamada, executando ping imediato.");
+  await makeRequests();
+  res.send('Ping executado manualmente via /pong.');
 });
 
-// Inicia o servidor
+// Inicia o servidor e dispara o primeiro ping imediatamente
 app.listen(PORT, () => {
   console.log(`Servidor de pings rodando na porta ${PORT}`);
+  schedulePing();
 });
