@@ -28,29 +28,38 @@ async function makeRequests() {
   }
 }
 
-// Função que executa o ping imediatamente e agenda o próximo ping
+// Função que executa o ping e agenda o próximo ping automaticamente
 async function schedulePing() {
   console.log("Executando ping imediato aos servidores...");
   await makeRequests();
   console.log("Ping enviado aos servidores de resposta.");
 
-  // Gera um intervalo aleatório para o próximo ping
+  // Agenda o próximo ping em um tempo aleatório
   const interval = getRandomInterval();
   const minutes = Math.floor(interval / 60000);
   const seconds = Math.floor((interval % 60000) / 1000);
-  console.log(`O próximo ping será em ${minutes} minuto(s) e ${seconds} segundo(s).`);
+  console.log(`O próximo ping automático será em ${minutes} minuto(s) e ${seconds} segundo(s).`);
 
   setTimeout(schedulePing, interval);
 }
 
-// Rota opcional para disparar o ping manualmente via /pong
+// Rota /pong: quando chamada, agenda um ping para ser enviado após um tempo aleatório
 app.get('/pong', async (req, res) => {
-  console.log("Rota /pong chamada, executando ping imediato.");
-  await makeRequests();
-  res.send('Ping executado manualmente via /pong.');
+  const interval = getRandomInterval();
+  const minutes = Math.floor(interval / 60000);
+  const seconds = Math.floor((interval % 60000) / 1000);
+  console.log(`Rota /pong chamada. Agendando ping para daqui a ${minutes} minuto(s) e ${seconds} segundo(s).`);
+
+  setTimeout(async () => {
+    console.log("Executando ping agendado via /pong...");
+    await makeRequests();
+    console.log("Ping enviado aos servidores de resposta (agendado via /pong).");
+  }, interval);
+
+  res.send(`Pong recebido. Ping agendado para daqui a ${minutes} minuto(s) e ${seconds} segundo(s).`);
 });
 
-// Inicia o servidor e dispara o primeiro ping imediatamente
+// Inicia o servidor e dispara o ciclo automático de pings
 app.listen(PORT, () => {
   console.log(`Servidor de pings rodando na porta ${PORT}`);
   schedulePing();
