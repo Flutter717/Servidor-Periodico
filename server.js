@@ -43,23 +43,17 @@ async function schedulePing() {
   setTimeout(schedulePing, interval);
 }
 
-// Rota /pong: quando chamada, agenda um ping para ser enviado após um tempo aleatório
-app.get('/pong', async (req, res) => {
-  const interval = getRandomInterval();
-  const minutes = Math.floor(interval / 60000);
-  const seconds = Math.floor((interval % 60000) / 1000);
-  console.log(`Rota /pong chamada. Agendando ping para daqui a ${minutes} minuto(s) e ${seconds} segundo(s).`);
-
-  setTimeout(async () => {
-    console.log("Executando ping agendado via /pong...");
-    await makeRequests();
-    console.log("Ping enviado aos servidores de resposta (agendado via /pong).");
-  }, interval);
-
-  res.send(`Pong recebido. Ping agendado para daqui a ${minutes} minuto(s) e ${seconds} segundo(s).`);
+// Rota /pong: apenas registra que recebeu um pong e identifica o servidor emissor
+app.get('/pong', (req, res) => {
+  // Tenta identificar o servidor que enviou o pong via query string ou usa o IP da requisição
+  const server = req.query.server || req.ip;
+  console.log(`Recebido pong de: ${server}`);
+  res.send(`Pong recebido de: ${server}`);
 });
 
 // Inicia o servidor e dispara o ciclo automático de pings
 app.listen(PORT, () => {
   console.log(`Servidor de pings rodando na porta ${PORT}`);
+  // Dispara o primeiro ping imediatamente ao iniciar o servidor
+  schedulePing();
 });
