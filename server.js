@@ -4,6 +4,7 @@ const app = express();
 
 const TARGET_SERVERS = [
   'https://agrosystem.onrender.com/ping',
+  'https://jelly-vki2.onrender.com/ping',
 ];
 
 const MAX_INTERVAL = 300000; // 5 minutos em milissegundos
